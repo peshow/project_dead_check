@@ -2,23 +2,37 @@ from email import encoders
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
+from pyhocon import ConfigFactory
 import smtplib
+import os
 
 
-def _format_addr(s):
-    name, addr = parseaddr(s)
-    return formataddr((Header(name, 'utf-8').encode(), addr))
+class SendEmail:
+    def __init__(self):
+        self.__conf = ConfigFactory.parse_file(os.path.join(os.getcwd(), 'conf/settings.conf'))
 
+    @staticmethod
+    def _format_address(self, s):
+        name, address = parseaddr(s)
+        return formataddr((Header(name, 'utf-8').encode(), address))
 
-def sendmail(mail_body, src, recipients_list, password, smtp_server="smtp.163.com"):
-    msg = MIMEText(mail_body, "plain", 'utf-8')
-    msg['To'] = _format_addr("Recipient <{}>".format(recipients_list))
-    msg['From'] = _format_addr("Author <{}>".format(src))
-    msg['Subject'] = Header('Error message', 'utf-8')
+    def send_mail(self, mail_body, subject=None, recipients=None):
+        smtp_server = self.__conf.get("email.smtp")
+        src = self.__conf.get("email.src")
+        subject = subject or self.__conf.get("email.subject")
+        port = self.__conf.get("email.port")
+        user = src
+        password = self.__conf.get("email.password")
+        recipients = recipients or self.__conf.get("email.recipients")
+        recipients_list = [i for i in recipients.split(",")]
 
-    server = smtplib.SMTP(smtp_server, 25)
-    server.login(src, password)
-    print(msg.as_string())
-    server.sendmail(src, [recipients_list], msg.as_string())
-    server.quit()
+        msg = MIMEText(mail_body, "plain", 'utf-8')
+        msg['To'] = self._format_address("Recipient <{}>".format(recipients))
+        msg['From'] = self._format_address("Author <{}>".format(src))
+        msg['Subject'] = Header(subject, 'utf-8')
+
+        server = smtplib.SMTP(smtp_server, port)                  # connect smtp server
+        server.login(user, password)                              # login
+        server.sendmail(src, recipients_list, msg.as_string())    # send email content
+        server.quit()
 
