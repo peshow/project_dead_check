@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import os
 import socket
 import datetime
 import pytz
@@ -27,27 +28,69 @@ DATE = get_current_time()
 
 
 class GenerateEmailVar:
-    def generate_subject(self, process_name, is_ok=False):
-        subject = "{} to be a zombie".format(process_name)
+    def __init__(self, process_name, ok_subject=None, ok_body=None, error_subject=None, error_body=None):
+        self.ok_subject = ok_subject
+        self.ok_body = ok_body
+        self.error_body = error_body
+        self.error_subject = error_subject
+        self.process_name = process_name
+
+    def generate_subject(self, is_ok=False):
+        subject = self.error_subject.format(self.process_name)
         if is_ok:
-            subject = "{} return to OK".format(process_name)
+            subject = self.ok_subject.format(self.process_name)
         return subject
 
-    def generate_mail_body(self, process_name=None, is_ok=False):
-        body = "{} had become a dead process".format(process_name)
+    def generate_mail_body(self, is_ok=False):
+        body = self.error_body.format(self.process_name)
         if is_ok:
-            body = "{} had return to running".format(process_name)
+            body = self.ok_body.format(self.process_name)
         mail_body = '''
-        IP: {ip}
-        Date: {date}
-        Content: {body}'''.format(ip=IP, date=DATE, body=body)
+        <p><strong>IP:</strong> {ip}</p>
+        <p><strong>Date:</strong> {date}<p>
+        <p><strong>Project:</strong> {process_name}<p>
+        <strong>Content:</strong>
+        <pre>{body}</pre>'''.format(ip=IP,
+                                    date=DATE,
+                                    process_name=self.process_name,
+                                    body=body)
         return mail_body
 
-    def generate_dict(self, process):
+    def generate_dict(self):
         dictionary = {
-            "error_subject": self.generate_subject(process),
-            "error_body": self.generate_mail_body(process),
-            "ok_subject": self.generate_subject(process, is_ok=True),
-            "ok_body": self.generate_mail_body(process, is_ok=True)
+            "error_subject": self.generate_subject(),
+            "error_body": self.generate_mail_body(),
+            "ok_subject": self.generate_subject(is_ok=True),
+            "ok_body": self.generate_mail_body(is_ok=True)
+        }
+        return dictionary
+
+
+class GenerateMonitorVar:
+    def __init__(self, subject=None, process_name=None, recipients=None):
+        self.subject= subject
+        self.process_name = process_name
+        self.recipients = recipients
+
+    def edit_subject(self):
+        return self.subject.format(self.process_name)
+
+    def generate_mail_body(self, body):
+        mail_body = '''
+        <p><strong>IP:</strong> {ip}</p>
+        <p><strong>Date:</strong> {date}<p>
+        <p><strong>Project:</strong> {process_name}<p>
+        <strong>Content:</strong>
+        <pre>{body}</pre>'''.format(ip=IP,
+                                    date=DATE,
+                                    process_name=self.process_name,
+                                    body=body)
+        return mail_body
+
+    def generate_dict(self, body):
+        dictionary = {
+            "subject": self.edit_subject(),
+            "mail_body": self.generate_mail_body(body),
+            "recipients": self.recipients
         }
         return dictionary

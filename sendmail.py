@@ -9,29 +9,31 @@ import os
 
 class SendEmail:
     def __init__(self):
-        self.__conf = ConfigFactory.parse_file(os.path.join(os.getcwd(), 'conf/settings.conf'))
+        self.__conf = ConfigFactory.parse_file(os.path.join(os.getcwd(), 'conf/mail.conf')).get("email")
+
+        self.smtp_server = self.__conf.get("smtp")
+        self.port = self.__conf.get("port")
+        self.user = self.src = self.__conf.get("src")
+        self.password = self.__conf.get("password")
+        self.recipients_list = None
+        self.msg = None
 
     def _format_address(self, s):
         name, address = parseaddr(s)
         return formataddr((Header(name, 'utf-8').encode(), address))
 
-    def send_mail(self, mail_body, subject=None, recipients=None):
-        smtp_server = self.__conf.get("email.smtp")
-        src = self.__conf.get("email.src")
-        subject = subject or self.__conf.get("email.subject")
-        port = self.__conf.get("email.port")
-        user = src
-        password = self.__conf.get("email.password")
+    def build_mail(self, mail_body, subject=None, recipients=None):
         recipients = recipients or self.__conf.get("email.recipients")
-        recipients_list = recipients.split(",")
+        self.recipients_list = recipients.split(",")
 
-        msg = MIMEText(mail_body, "plain", 'utf-8')
-        msg['To'] = self._format_address("Recipient <{}>".format(recipients))
-        msg['From'] = self._format_address("m1world.com <{}>".format(src))
-        msg['Subject'] = Header(subject, 'utf-8')
+        self.msg = MIMEText(mail_body, "html", 'utf-8')
+        self.msg['To'] = self._format_address("Recipient <{}>".format(recipients))
+        self.msg['From'] = self._format_address("m1world.com <{}>".format(self.src))
+        self.msg['Subject'] = Header(subject, 'utf-8')
 
-        server = smtplib.SMTP(smtp_server, port)                  # connect smtp server
-        server.login(user, password)                              # login
-        server.sendmail(src, recipients_list, msg.as_string())    # send email content
+    def send(self):
+        server = smtplib.SMTP(self.smtp_server, self.port)                  # connect smtp server
+        server.login(self.user, self.password)                              # login
+        server.sendmail(self.src, self.recipients_list, self.msg.as_string())    # send email content
         server.quit()
 
