@@ -5,7 +5,7 @@ from pyhocon import ConfigFactory
 from func.thanatosis import CheckDead
 from conf.email_var import GenerateEmailVar, GenerateMonitorVar
 from func.log_momitor import LogMonitor
-from m_error.custom_error import ParamsIsNone
+from m_error.custom_error import *
 
 
 def build_conf(conf):

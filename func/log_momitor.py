@@ -24,8 +24,10 @@ class LogMonitor:
         self.patterns = patterns.split(",")
         self.mail_build_func = mail_build_func
         self.__cursor = os.path.getsize(files)
+        self.__current_cursor = None
         self.deque = deque(maxlen=3)
-        self.number = self.behind = behind
+        self.behind = behind
+        self.number = behind + 1
         self.time_format = time_format
         self.auto_cut = auto_cut
         self.file_exists = 0
@@ -38,8 +40,8 @@ class LogMonitor:
         """
         try:
             with open(self.__files) as f:
-                end_of_file = os.path.getsize(self.__files)
-                if end_of_file < self.__cursor and self.auto_cut:
+                self.__current_cursor = os.path.getsize(self.__files)
+                if self.__current_cursor < self.__cursor and self.auto_cut:
                     with open(self.cut()) as f_prev:
                         f_prev.seek(self.__cursor)
                         yield from f_prev
@@ -63,10 +65,7 @@ class LogMonitor:
                 self.deque.append(line)
                 self.number += 1
                 if self.number == self.behind:
-                    self.send()
-                    print("is_send")
-                    self.number = 0
-                    return
+                    break
                 continue
             for pattern_t in self.patterns:
                 pattern = re.compile(pattern_t)
@@ -74,6 +73,12 @@ class LogMonitor:
                 if m:
                     self.number = 0
                     self.deque.append(line)
+        if self.number <= self.behind:
+            self.send()
+            print("Mail is send")
+            self.__cursor = self.__current_cursor
+            self.number = self.behind + 1
+            self.deque = deque(maxlen=3)
 
     def cut(self):
         """

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 #
 from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundSchedul
 
 
 class BaseScheduler:
