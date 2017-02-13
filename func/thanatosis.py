@@ -77,7 +77,6 @@ class CheckDead:
         """
         print(self.current_counts_error_send, self.counts_send)
         if self.current_counts_error_send < self.counts_send:
-            print(11234)
             self.current_counts_error_send += 1
             self.__error_is_send = True
             self.send_mail.build_mail(self.mail_body["error_body"],

@@ -9,7 +9,8 @@ class LogMonitor:
     def __init__(self, files, patterns, mail_build_func,
                  auto_cut=True,
                  time_format=".%Y-%m-%d",
-                 behind=2):
+                 behind=2,
+                 counts_send=1):
         """
         实现日志文件的增量监控，
         并可针对日志切割做处理
@@ -27,11 +28,13 @@ class LogMonitor:
         self.__current_cursor = None
         self.deque = deque(maxlen=3)
         self.behind = behind
+        self.counts_send = counts_send
         self.number = behind + 1
         self.time_format = time_format
         self.auto_cut = auto_cut
         self.file_exists = 0
         self.is_end_of_file = False
+        self.current_counts_error_send = 0
         self.send_mail = SendEmail()
 
     def __read_file(self):
@@ -73,6 +76,8 @@ class LogMonitor:
                 if m:
                     self.number = 0
                     self.deque.append(line)
+                else:
+                    self.current_counts_error_send = 0
         if self.number <= self.behind:
             self.send()
             print("Mail is send")
@@ -94,7 +99,9 @@ class LogMonitor:
         """
         执行邮件发送
         """
-        dictionary = self.mail_build_func.generate_dict("".join(self.deque))
-        self.send_mail.build_mail(**dictionary)
-        self.send_mail.send()
+        if self.current_counts_error_send < self.counts_send:
+            self.current_counts_error_send += 1
+            dictionary = self.mail_build_func.generate_dict("".join(self.deque))
+            self.send_mail.build_mail(**dictionary)
+            self.send_mail.send()
 

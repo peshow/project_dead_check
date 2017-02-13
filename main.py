@@ -2,6 +2,7 @@ import os
 import pytz
 from base.scheduler import Blocking
 from pyhocon import ConfigFactory
+from functools import wraps
 from func.thanatosis import CheckDead
 from var.m_log_var import GenerateMonitorVar
 from var.dead_var import GenerateEmailVar
@@ -43,7 +44,8 @@ class BaseAddConf:
             return
         self.params[key] = element.get(key)
 
-    def total_seconds(self, scheduler_time):
+    @staticmethod
+    def total_seconds(scheduler_time):
         """
         将时间计算成秒数
         """
@@ -62,6 +64,17 @@ class BaseAddConf:
         附加额外的配置参数
         """
         self.params_string.update(dictionary)
+
+    def parse_config(self, add_params_string):
+        """
+        读取配置文件中的配置项
+        """
+        self.add_params_string(add_params_string)
+        for element in self.conf.get("thread").values():
+            for k, v in self.params_string.items():
+                self.parse_params(k, element, v)
+            self.items.append(self.params)
+            self.params = {}
 
     @staticmethod
     def build_conf(conf):
@@ -98,28 +111,14 @@ class AddDeadConfig(BaseAddConf):
         dictionary = email_dict.generate_dict()
         return dictionary
 
-    def parse_config(self):
-        """
-        读取配置文件中的配置项
-        """
-        self.add_params_string({"counts_send": 1})
-        for element in self.conf.get("thread").values():
-            for k, v in self.params_string.items():
-                self.parse_params(k, element, v)
-            # self.params["project"] = element.get("project")
-            # self.params["recipients"] = element.get("recipients", self.conf.get("global.recipients"))
-            # self.params["log_path"] = element.get("log_path")
-            # self.params["counts_send"] = element.get("counts_send", self.conf.get("counts_send"))
-            # self.params["scheduler"] = element.get("scheduler", self.conf.get("global.scheduler"))
-            self.items.append(self.params)
-            self.params = {}
-
     def add_dead_monitor(self, func):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
         """
-        self.parse_config()
+        add_params_string = {"counts_send": 1}
+        self.parse_config(add_params_string)
         for item in self.items:
+            self.inspect_params(item)
             delay = self.total_seconds(item["scheduler"])
             check_dead = CheckDead(item["log_path"],
                                    item["counts_send"],
@@ -146,28 +145,31 @@ class AddLogConfig(BaseAddConf):
     #     for key, value in item.items():
     #         if value is None:
     #             raise ParamsIsNone(key, self.conf_name)
-            
-    def parse_config(self):
-        """
-        读取配置文件中的配置项
-        """
-        for key, element in self.conf.get("thread").items():
-            self.params["project"] = element.get("project")
-            self.params["recipients"] = element.get("recipients", self.conf.get("global.recipients"))
-            self.params["log_path"] = element.get("log_path")
-            self.params["patterns"] = element.get("patterns", self.conf.get("global.patterns"))
-            self.params["auto_cut"] = element.get("auto_cut", self.conf.get("global.auto_cut"))
-            self.params["subject"] = element.get("subject", self.conf.get("global.subject"))
-            self.params["scheduler"] = element.get("scheduler", self.conf.get("global.scheduler"))
 
-            self.items.append(self.params)
-            self.params = {}
+    # def parse_config(self):
+    #     """
+    #     读取配置文件中的配置项
+    #     """
+    #
+    #     self.add_params_string(add_params_string)
+    #     for key, element in self.conf.get("thread").items():
+    #         self.params["project"] = element.get("project")
+    #         self.params["recipients"] = element.get("recipients", self.conf.get("global.recipients"))
+    #         self.params["log_path"] = element.get("log_path")
+    #         self.params["patterns"] = element.get("patterns", self.conf.get("global.patterns"))
+    #         self.params["auto_cut"] = element.get("auto_cut", self.conf.get("global.auto_cut"))
+    #         self.params["subject"] = element.get("subject", self.conf.get("global.subject"))
+    #         self.params["scheduler"] = element.get("scheduler", self.conf.get("global.scheduler"))
+    #
+    #         self.items.append(self.params)
+    #         self.params = {}
 
     def add_log_monitor(self, func):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
         """
-        self.parse_config()
+        add_params_string = {"counts_send": 1, "patterns": 1, "auto_cut": 1, "subject": 1}
+        self.parse_config(add_params_string)
         for item in self.items:
             self.inspect_params(item)
             mail_build_func = GenerateMonitorVar(subject=item["subject"],
