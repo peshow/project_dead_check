@@ -179,6 +179,7 @@ class AddLogConfig(BaseAddConf):
                                      mail_build_func,
                                      item["auto_cut"])
             func(log_monitor.main_parse,
+                 max_instances=10,
                  timezone=pytz.timezone("Asia/Shanghai"),
                  **item["scheduler"])
 
@@ -189,8 +190,8 @@ if __name__ == '__main__':
     parse_config = AddDeadConfig()
     parse_config.add_dead_monitor(scheduler.add_job)
 
-    # add_log_config = AddLogConfig()
-    # add_log_config.add_log_monitor(scheduler.add_job)
+    add_log_config = AddLogConfig()
+    add_log_config.add_log_monitor(scheduler.add_job)
 
     try:
         scheduler.start()

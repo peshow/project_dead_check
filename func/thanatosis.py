@@ -26,14 +26,14 @@ class CheckDead:
         self.__error_is_send = False
         self.send_mail = SendEmail()
 
-    # def __check_is_first(self):
-    #     """
-    #     判断是否是第一次执行
-    #     """
-    #     if self.__is_first_run:
-    #         self.__is_first_run = False
-    #         time.sleep(5)
-    #         return True
+    def __check_is_first(self):
+        """
+        判断是否是第一次执行
+        """
+        if self.__is_first_run:
+            self.__is_first_run = False
+            time.sleep(3)
+            return True
 
     def check_size_change(self):
         """
@@ -42,6 +42,7 @@ class CheckDead:
         size = os.path.getsize(self.log_path)
         diff_value = size - self.previous_size
         if diff_value == 0:
+            print("size not change")
             return True
         self.previous_size = size
         return
@@ -50,26 +51,24 @@ class CheckDead:
         """
         检查文件ctime是否发生变化
         """
-        now = datetime.now().timestamp()
+        now = os.path.getctime(self.log_path)
         delay = now - self.previous_ctime
-        print(delay)
-        if delay > self.delay:
+        if delay == 0:
+            print("time not change")
             return True
-        self.previous_size = now
+        self.previous_ctime = now
         return
 
     def main_check(self):
         """
         进程假死检测主函数
         """
-        # if self.__check_is_first():
-        #     return
-        print(self.check_ctime_change(), self.check_size_change())
+        if self.__check_is_first():
+            return
         if self.check_ctime_change() or self.check_size_change():
-            print("Not change")
             self.__error_send()
         else:
-            print(4444)
+            print("return is_ok\n")
             self.__ok_send()
 
     def __error_send(self):
@@ -78,6 +77,7 @@ class CheckDead:
         """
         print(self.current_counts_error_send, self.counts_send)
         if self.current_counts_error_send < self.counts_send:
+            print(11234)
             self.current_counts_error_send += 1
             self.__error_is_send = True
             self.send_mail.build_mail(self.mail_body["error_body"],
@@ -91,12 +91,12 @@ class CheckDead:
         发送返回正常邮件
         """
         if self.__error_is_send:
+            self.current_counts_error_send = 0
+            self.__error_is_send = False
             self.send_mail.build_mail(self.mail_body["ok_body"],
                                       self.mail_body["ok_subject"],
                                       self.recipients)
             self.send_mail.send()
-            self.current_counts_error_send = 0
-            self.__error_is_send = False
             print("return ok {} send".format(self.log_path), self.__error_is_send)
 
 
