@@ -141,7 +141,7 @@ class AddLogConfig(BaseAddConf):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
         """
-        add_params_string = {"counts_send": 1, "patterns": 1, "auto_cut": 1, "subject": 1}
+        add_params_string = {"counts_send": 1, "patterns": 1, "auto_cut": 1, "subject": 1, "behind": 1}
         self.parse_config(add_params_string)
         for item in self.items:
             self.inspect_params(item)
