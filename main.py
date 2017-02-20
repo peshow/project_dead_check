@@ -159,19 +159,28 @@ class AddLogConfig(BaseAddConf):
                  **item["scheduler"])
 
 
-
-if __name__ == '__main__':
-    scheduler = Blocking()
-
+def check_arg():
+    counts = 0
     rest = arg_parse()
     if rest.dead:
         parse_config = AddDeadConfig()
         parse_config.add_dead_monitor(scheduler.add_job)
+        counts += 1
     if rest.log:
         add_log_config = AddLogConfig()
         add_log_config.add_log_monitor(scheduler.add_job)
+        counts += 1
+    return counts 
 
-    try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
+
+if __name__ == '__main__':
+    scheduler = Blocking()
+    counts = check_arg()
+
+    if counts > 0:
+        try:
+            scheduler.start()
+        except (KeyboardInterrupt, SystemExit):
+            scheduler.shutdown()
+    else:
+        arg_parse(["-h"])
