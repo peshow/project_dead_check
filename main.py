@@ -2,12 +2,12 @@ import os
 import pytz
 from base.scheduler import Blocking
 from pyhocon import ConfigFactory
-from functools import wraps
 from func.thanatosis import CheckDead
 from var.m_log_var import GenerateMonitorVar
 from var.dead_var import GenerateEmailVar
 from func.log_momitor import LogMonitor
 from m_error.custom_error import *
+from middle.argumentParse import arg_parse
 
 
 class BaseAddConf:
@@ -137,33 +137,6 @@ class AddLogConfig(BaseAddConf):
         """
         super().__init__(conf_name)
 
-    # def __inspect_params(self, item):
-    #     """
-    #     检查配置项是否有空值
-    #     :param item: 轮询查看每个item
-    #     """
-    #     for key, value in item.items():
-    #         if value is None:
-    #             raise ParamsIsNone(key, self.conf_name)
-
-    # def parse_config(self):
-    #     """
-    #     读取配置文件中的配置项
-    #     """
-    #
-    #     self.add_params_string(add_params_string)
-    #     for key, element in self.conf.get("thread").items():
-    #         self.params["project"] = element.get("project")
-    #         self.params["recipients"] = element.get("recipients", self.conf.get("global.recipients"))
-    #         self.params["log_path"] = element.get("log_path")
-    #         self.params["patterns"] = element.get("patterns", self.conf.get("global.patterns"))
-    #         self.params["auto_cut"] = element.get("auto_cut", self.conf.get("global.auto_cut"))
-    #         self.params["subject"] = element.get("subject", self.conf.get("global.subject"))
-    #         self.params["scheduler"] = element.get("scheduler", self.conf.get("global.scheduler"))
-    #
-    #         self.items.append(self.params)
-    #         self.params = {}
-
     def add_log_monitor(self, func):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
@@ -186,14 +159,17 @@ class AddLogConfig(BaseAddConf):
                  **item["scheduler"])
 
 
+
 if __name__ == '__main__':
     scheduler = Blocking()
 
-    parse_config = AddDeadConfig()
-    parse_config.add_dead_monitor(scheduler.add_job)
-
-    add_log_config = AddLogConfig()
-    add_log_config.add_log_monitor(scheduler.add_job)
+    rest = arg_parse()
+    if rest.dead:
+        parse_config = AddDeadConfig()
+        parse_config.add_dead_monitor(scheduler.add_job)
+    if rest.log:
+        add_log_config = AddLogConfig()
+        add_log_config.add_log_monitor(scheduler.add_job)
 
     try:
         scheduler.start()
