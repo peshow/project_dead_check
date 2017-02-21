@@ -16,7 +16,7 @@
 * base：管理项目的任务调度执行，使用的是APScheudler
 * middle：中间函数，现只有命令行参数解析
 * func：项目的功能实现
-* m_logs：日志相关
+* log：存放日志文件的目录
 * requirement.txt：依赖的Python库信息
 * sendmail.py：邮件发送文件
 * main.py：项目启动文件
@@ -41,7 +41,8 @@ $ vim conf/mail.conf
     port = 25                // smtp服务器的端口
     src = "test@163.com"     // 邮箱账号，也是发送邮件的用户
     password = "XXXXXXXX"    // 邮箱密码
-  }
+    send_id = "系统管理员"    // 邮件中显示的发件人名称
+    }
 }
 ```
 
