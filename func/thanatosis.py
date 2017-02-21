@@ -1,6 +1,6 @@
 import os
 import time
-from datetime import datetime
+from var.global_var import log_settings
 from sendmail import SendEmail
 
 
@@ -25,6 +25,7 @@ class CheckDead:
         self.current_counts_error_send = 0
         self.__error_is_send = False
         self.send_mail = SendEmail()
+        self.log = log_settings("log/dead_monitor.log")
 
     def __check_is_first(self):
         """
@@ -42,7 +43,7 @@ class CheckDead:
         size = os.path.getsize(self.log_path)
         diff_value = size - self.previous_size
         if diff_value == 0:
-            print("size not change")
+            self.log.info("file size not change")
             return True
         self.previous_size = size
         return
@@ -54,7 +55,7 @@ class CheckDead:
         now = os.path.getctime(self.log_path)
         delay = now - self.previous_ctime
         if delay == 0:
-            print("time not change")
+            self.log.info("file ctime not change")
             return True
         self.previous_ctime = now
         return
@@ -68,7 +69,6 @@ class CheckDead:
         if self.check_ctime_change() or self.check_size_change():
             self.__error_send()
         else:
-            print("return is_ok\n")
             self.__ok_send()
 
     def __error_send(self):
@@ -82,8 +82,9 @@ class CheckDead:
             self.send_mail.build_mail(self.mail_body["error_body"],
                                       self.mail_body["error_subject"],
                                       self.recipients)
+            self.log.info("error {} send".format(self.log_path))
             self.send_mail.send()
-            print("error {} send".format(self.log_path), self.__error_is_send)
+            self.log.error("Dead monitor error email was send")
 
     def __ok_send(self):
         """
@@ -95,24 +96,6 @@ class CheckDead:
             self.send_mail.build_mail(self.mail_body["ok_body"],
                                       self.mail_body["ok_subject"],
                                       self.recipients)
+            self.log.info("return ok {} send".format(self.log_path))
             self.send_mail.send()
-            print("return ok {} send".format(self.log_path), self.__error_is_send)
-
-
-
-# class MultiThreading:
-#     def __init__(self):
-#         self.file_list = conf.get("thread.logfile")
-#
-#     def start_thread(self):
-#         for logfile in self.file_list:
-#             checkDead = CheckDead()
-#             t = threading.Thread(target=checkDead.main_check, name=os.path.basename(logfile), args=(logfile,))
-#             t.start()
-#
-# if __name__ == "__main__":
-#     try:
-#         multi = MultiThreading()
-#         multi.start_thread()
-#     except KeyboardInterrupt:
-#         Event.set()
+            self.log.error("Dead monitor return ok email was send")

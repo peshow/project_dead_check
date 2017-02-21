@@ -1,5 +1,6 @@
 import sys
-import argparse 
+import argparse
+
 
 def arg_parse(arg=sys.argv[1:]):
     parse = argparse.ArgumentParser(description="自定义监控")

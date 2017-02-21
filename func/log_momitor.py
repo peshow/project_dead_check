@@ -3,6 +3,7 @@ import re
 from collections import deque
 from sendmail import SendEmail
 from datetime import timedelta, datetime
+from var.global_var import log_settings
 
 
 class LogMonitor:
@@ -36,6 +37,7 @@ class LogMonitor:
         self.is_end_of_file = False
         self.current_counts_error_send = 0
         self.send_mail = SendEmail()
+        self.log = log_settings("log/log_monitor.log")
 
     def __read_file(self):
         """
@@ -80,7 +82,6 @@ class LogMonitor:
                     self.current_counts_error_send = 0
         if self.number <= self.behind:
             self.send()
-            print("Mail is send")
             self.__cursor = self.__current_cursor
             self.number = self.behind + 1
             self.deque = deque(maxlen=3)
@@ -102,6 +103,8 @@ class LogMonitor:
         if self.current_counts_error_send < self.counts_send:
             self.current_counts_error_send += 1
             dictionary = self.mail_build_func.generate_dict("".join(self.deque))
+            self.log.error('Error Message\n {}'.format("".join(self.deque)))
             self.send_mail.build_mail(**dictionary)
             self.send_mail.send()
+            self.log.error("Log monitor error email was send")
 

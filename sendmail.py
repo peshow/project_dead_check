@@ -1,5 +1,4 @@
 import os
-import sys
 import smtplib
 from email.header import Header
 from pyhocon import ConfigFactory
@@ -14,7 +13,7 @@ class SendEmail:
     def __init__(self):
         self.__conf = ConfigFactory.parse_file(os.path.join(os.getcwd(), 'conf/mail.conf')).get("email")
 
-        self.params = ["smtp", "port", "src", "password", "user"]
+        self.params = ["smtp", "port", "src", "password", "user", "send_id"]
         for item in self.params:
             self.general_parm(item)
         self.recipients_list = None
@@ -43,7 +42,7 @@ class SendEmail:
 
         self.msg = MIMEText(mail_body, "html", 'utf-8')
         self.msg['To'] = self._format_address("Recipient <{}>".format(recipients))
-        self.msg['From'] = self._format_address("m1world.com <{}>".format(self.ITEMS["src"]))
+        self.msg['From'] = self._format_address("{} <{}>".format(self.ITEMS["send_id"], self.ITEMS["src"]))
         self.msg['Subject'] = Header(subject, 'utf-8')
 
     def check_param(self):
@@ -56,7 +55,6 @@ class SendEmail:
         执行邮件发送(Perform the mail delivery)
         """
         self.check_param()
-        print("abc")
         server = smtplib.SMTP(self.ITEMS["smtp"], self.ITEMS["port"])                      # connect smtp server
         server.login(self.ITEMS["user"], self.ITEMS["password"])                                  # login
         server.sendmail(self.ITEMS["src"], self.recipients_list, self.msg.as_string())   # send email content

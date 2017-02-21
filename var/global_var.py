@@ -1,6 +1,16 @@
+import os
 import pytz
 import socket
 import datetime
+import logging
+
+def log_settings(logname):
+    path = os.path.join(os.getcwd(), logname)
+    print(path)
+    logging.basicConfig(filename=path,
+                        level=logging.INFO,
+                        format='[%(asctime)s] %(levelname)s [%(threadName)s] - %(message)s')
+    return logging
 
 
 def get_ip():
