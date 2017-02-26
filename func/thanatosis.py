@@ -1,11 +1,34 @@
 import os
+import re
 import time
+import psutil
+from functools import wraps
 from var.global_var import log_settings
 from sendmail import SendEmail
 
+global_log = log_settings("log/dead_monitor.log")
+
+
+def check_running(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        self = args[0]
+        command = re.compile(self.command)
+        is_running = False
+        for prc in psutil.process_iter():
+            cmd = " ".join(prc.cmdline())
+            if command.search(cmd):
+                is_running = True
+        if is_running:
+            result = func(*args, **kwargs)
+            return result
+        else:
+            global_log.warning("[{}] is not stop running!".format(self.command))
+    return wrapper
+
 
 class CheckDead:
-    def __init__(self, log_path, counts_send, delay=60, mail_body=None, recipients=None):
+    def __init__(self, log_path, counts_send, command, delay=60, mail_body=None, recipients=None):
         """
         根据日志文件的ctime和size的变化，判断进程是否假死
         :param log_path: 日志文件位置
@@ -16,16 +39,17 @@ class CheckDead:
         """
         self.log_path = log_path
         self.counts_send = counts_send
+        self.command = command
         self.mail_body = mail_body
         self.recipients = recipients
         self.delay = delay
         self.previous_size = os.path.getsize(log_path)
         self.previous_ctime = os.path.getctime(log_path)
         self.__is_first_run = True
-        self.current_counts_error_send = 0
         self.__error_is_send = False
         self.send_mail = SendEmail()
-        self.log = log_settings("log/dead_monitor.log")
+
+        self.current_counts_error_send = 0
 
     def __check_is_first(self):
         """
@@ -43,7 +67,7 @@ class CheckDead:
         size = os.path.getsize(self.log_path)
         diff_value = size - self.previous_size
         if diff_value == 0:
-            self.log.info("file size not change")
+            global_log.info("file size not change")
             return True
         self.previous_size = size
         return
@@ -55,11 +79,12 @@ class CheckDead:
         now = os.path.getctime(self.log_path)
         delay = now - self.previous_ctime
         if delay == 0:
-            self.log.info("file ctime not change")
+            global_log.info("file ctime not change")
             return True
         self.previous_ctime = now
         return
 
+    @check_running
     def main_check(self):
         """
         进程假死检测主函数
@@ -75,16 +100,15 @@ class CheckDead:
         """
         发送异常邮件
         """
-        print(self.current_counts_error_send, self.counts_send)
         if self.current_counts_error_send < self.counts_send:
             self.current_counts_error_send += 1
             self.__error_is_send = True
             self.send_mail.build_mail(self.mail_body["error_body"],
                                       self.mail_body["error_subject"],
                                       self.recipients)
-            self.log.info("error {} send".format(self.log_path))
+            global_log.info("error {} send".format(self.log_path))
             self.send_mail.send()
-            self.log.error("Dead monitor error email was send")
+            global_log.error("Dead monitor error email was send")
 
     def __ok_send(self):
         """
@@ -96,6 +120,6 @@ class CheckDead:
             self.send_mail.build_mail(self.mail_body["ok_body"],
                                       self.mail_body["ok_subject"],
                                       self.recipients)
-            self.log.info("return ok {} send".format(self.log_path))
+            global_log.info("return ok {} send".format(self.log_path))
             self.send_mail.send()
-            self.log.error("Dead monitor return ok email was send")
+            global_log.error("Dead monitor return ok email was send")

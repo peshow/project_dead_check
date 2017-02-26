@@ -115,13 +115,14 @@ class AddDeadConfig(BaseAddConf):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
         """
-        add_params_string = {"counts_send": 1}
+        add_params_string = {"counts_send": 1, "command": 0}
         self.parse_config(add_params_string)
         for item in self.items:
             self.inspect_params(item)
             delay = self.total_seconds(item["scheduler"])
             check_dead = CheckDead(item["log_path"],
                                    item["counts_send"],
+                                   item["command"],
                                    delay,
                                    self.__generate(item["project"]),
                                    item["recipients"])
