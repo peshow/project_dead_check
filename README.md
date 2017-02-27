@@ -7,8 +7,9 @@
     
 * 增量监控日志的异常信息：
     针对大日志文件做到减少监控资源
+
+* 监控进程的运行状态
    
-   
 **目录结构：**
 * conf：核心配置文件，main.py读取配置文件中的信息完成操作
 * var：各项目的变量函数及公共变量
@@ -52,6 +53,7 @@ $ vim conf/settings.conf
 thread {
   file1 {                     // 线程编号, 可随意定义
     project = "a.log"         // 项目名称
+    command = "python a.py"   // 运行的进程命令
     counts_send = 1           // 连续错误时，邮件发送上限
     log_path = "/data/a.log"  // 进程输出的日志路径
     recipients = "test@qq.com" // 收件人列表, 以逗号隔开
@@ -82,9 +84,25 @@ thread {
 }
 ```
 
+**配置进程存活监控**
+```
+thread {                         ## 各线程配置段
+  file1 {                        ## 线程编号, 可随意定义
+    project = "Monitor a.py"      // 监控的项目名
+    command = "python a.py"       // 运行的进程命令
+    recipients = "test@qq.com"
+    scheduler = {                 // 配置任务调度，即监控间隔
+      trigger = interval
+      seconds = 5
+      }
+  }
+
+
+```
 **启动监控:**
-* -l：仅启动日志异常监控
+* -m：仅启动日志异常监控
 * -d：仅启动进程假死监控
+* -i: 仅启动进程存活监控
 ```
 nohup python main.py -l -d &
 ```
