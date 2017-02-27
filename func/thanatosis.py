@@ -69,7 +69,7 @@ class CheckDead(EmailMixIn):
         size = os.path.getsize(self.log_path)
         diff_value = size - self.previous_size
         if diff_value == 0:
-            self.logging.info("file size not change")
+            self.logging.info("[{}] size is not change".format(self.project))
             return True
         self.previous_size = size
         return
@@ -81,7 +81,7 @@ class CheckDead(EmailMixIn):
         now = os.path.getctime(self.log_path)
         delay = now - self.previous_ctime
         if delay == 0:
-            self.logging.info("file ctime not change")
+            self.logging.info("[{}] ctime is not change".format(self.project))
             return True
         self.previous_ctime = now
         return

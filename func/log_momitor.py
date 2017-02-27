@@ -7,7 +7,7 @@ from var.global_var import log_settings
 
 
 class LogMonitor:
-    def __init__(self, files, patterns, mail_build_func,
+    def __init__(self, log_path, patterns, mail_build_func,
                  auto_cut=True,
                  time_format=".%Y-%m-%d",
                  behind=2,
@@ -15,17 +15,17 @@ class LogMonitor:
         """
         实现日志文件的增量监控，
         并可针对日志切割做处理
-        :param files: 监控的日志文件路径
+        :param log_path: 监控的日志文件路径
         :param patterns: 异常检索的正则匹配，以逗号分隔的字符串
         :param mail_build_func: 构建邮件内容的函数
         :param auto_cut: 是否启用日志切割
         :param time_format: 日志切割的事件格式
         :param behind: 取出匹配到异常后多少行
         """
-        self.__files = files
+        self.log_path = log_path
         self.patterns = patterns.split(",")
         self.mail_build_func = mail_build_func
-        self.__cursor = os.path.getsize(files)
+        self.__cursor = os.path.getsize(log_path)
         self.__current_cursor = None
         self.deque = deque(maxlen=3)
         self.behind = behind
@@ -44,8 +44,8 @@ class LogMonitor:
         读取文件内容，并能读取切割后的文件
         """
         try:
-            with open(self.__files) as f:
-                self.__current_cursor = os.path.getsize(self.__files)
+            with open(self.log_path) as f:
+                self.__current_cursor = os.path.getsize(self.log_path)
                 if self.__current_cursor < self.__cursor and self.auto_cut:
                     with open(self.cut()) as f_prev:
                         f_prev.seek(self.__cursor)
@@ -57,7 +57,7 @@ class LogMonitor:
         except FileNotFoundError:
             self.file_exists += 1
             if self.file_exists > 3:
-                print("File is NotFound")
+                self.logging.error("{} is Not Found".format(self.log_path))
 
     def main_parse(self):
         """
@@ -93,7 +93,7 @@ class LogMonitor:
         """
         yesterday = datetime.today() - timedelta(days=1)
         prev_date = yesterday.strftime(self.time_format)
-        pre_file = self.__files + prev_date
+        pre_file = self.log_path + prev_date
         return pre_file
 
     def send(self):
