@@ -4,8 +4,9 @@ from base.scheduler import Blocking
 from pyhocon import ConfigFactory
 from func.thanatosis import CheckDead
 from var.m_log_var import GenerateMonitorVar
-from var.dead_var import GenerateEmailVar
+from var.dead_var import GenerateEmailVar, GeneralMailMixIn
 from func.log_momitor import LogMonitor
+from func.inspect_process_alive import InspectProcessAlive
 from m_error.custom_error import *
 from middle.argumentParse import arg_parse
 
@@ -59,17 +60,31 @@ class BaseAddConf:
                 count_seconds += v
         return count_seconds
 
-    def add_params_string(self, dictionary):
+    def add_params_string(self, dictionary=None):
         """
         附加额外的配置参数
         """
-        self.params_string.update(dictionary)
+        if dictionary:
+            self.params_string.update(dictionary)
 
-    def parse_config(self, add_params_string):
+    def del_params_string(self, *args):
+        first, *_ = args
+        if first is not None:
+            for key in args:
+                self.params_string.pop(key)
+
+    def edit_params_string(self, add=None, delete=None):
+        """
+        overwrite this function, general the params
+        """
+        self.add_params_string(add)
+        self.del_params_string(delete)
+        self.parse_config()
+
+    def parse_config(self):
         """
         读取配置文件中的配置项
         """
-        self.add_params_string(add_params_string)
         for element in self.conf.get("thread").values():
             for k, v in self.params_string.items():
                 self.parse_params(k, element, v)
@@ -94,38 +109,29 @@ class BaseAddConf:
         pass
 
 
-class AddDeadConfig(BaseAddConf):
+class AddDeadConfig(BaseAddConf, GeneralMailMixIn):
     def __init__(self, conf_name="settings.conf"):
         """
         监控进程假死
         """
         super().__init__(conf_name)
 
-    def __generate(self, process_name):
-        """
-        生成邮件标题、正文字典的嵌套格式
-        :param process_name: 进程名称
-        """
-        email_dict = GenerateEmailVar(process_name=process_name,
-                                      **self.conf.get("global.subj_body"))
-        dictionary = email_dict.generate_dict()
-        return dictionary
-
     def add_dead_monitor(self, func):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
         """
-        add_params_string = {"counts_send": 1, "command": 0}
-        self.parse_config(add_params_string)
+        add = {"counts_send": 1, "command": 0}
+        self.edit_params_string(add)
         for item in self.items:
             self.inspect_params(item)
             delay = self.total_seconds(item["scheduler"])
-            check_dead = CheckDead(item["log_path"],
+            check_dead = CheckDead(item["project"],
+                                   item["log_path"],
                                    item["counts_send"],
                                    item["command"],
-                                   delay,
-                                   self.__generate(item["project"]),
-                                   item["recipients"])
+                                   self.generate(item["project"]),
+                                   item["recipients"],
+                                   delay)
             func(check_dead.main_check,
                  timezone=pytz.timezone("Asia/Shanghai"),
                  **item["scheduler"])
@@ -142,8 +148,8 @@ class AddLogConfig(BaseAddConf):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
         """
-        add_params_string = {"counts_send": 1, "patterns": 1, "auto_cut": 1, "subject": 1, "behind": 1}
-        self.parse_config(add_params_string)
+        add = {"counts_send": 1, "patterns": 1, "auto_cut": 1, "subject": 1, "behind": 1}
+        self.edit_params_string(add)
         for item in self.items:
             self.inspect_params(item)
             mail_build_func = GenerateMonitorVar(subject=item["subject"],
@@ -160,23 +166,47 @@ class AddLogConfig(BaseAddConf):
                  **item["scheduler"])
 
 
-def check_arg():
+class AddAliveConfig(BaseAddConf, GeneralMailMixIn):
+    def __init__(self, conf_name="settings_alive.conf"):
+        super().__init__(conf_name)
+
+    def add_process_alive(self, func):
+        add = {"command": 0}
+        delete = ["log_path"]
+        self.edit_params_string(add, *delete)
+        for item in self.items:
+            self.inspect_params(item)
+            inspect_process_alive = InspectProcessAlive(item["project"],
+                                                        item["command"],
+                                                        self.generate(item["project"]),
+                                                        item["recipients"])
+            func(inspect_process_alive.main_inspect,
+                 max_instances=10,
+                 timezone=pytz.timezone("Asia/Shanghai"),
+                 **item["scheduler"])
+
+
+def check_arg(scheduler):
     counts = 0
     rest = arg_parse()
     if rest.dead:
         parse_config = AddDeadConfig()
         parse_config.add_dead_monitor(scheduler.add_job)
         counts += 1
-    if rest.log:
+    if rest.logging:
         add_log_config = AddLogConfig()
         add_log_config.add_log_monitor(scheduler.add_job)
+        counts += 1
+    if rest.alive:
+        parse_config = AddAliveConfig()
+        parse_config.add_process_alive(scheduler.add_job)
         counts += 1
     return counts 
 
 
 if __name__ == '__main__':
     scheduler = Blocking()
-    counts = check_arg()
+    counts = check_arg(scheduler)
 
     if counts > 0:
         try:

@@ -1,4 +1,51 @@
 from .global_var import *
+from sendmail import SendEmail
+
+
+class EmailMixIn:
+    current_counts_error_send = 0
+    send_mail = SendEmail()
+    error_is_send = False
+
+    def error_send(self):
+        """
+        发送异常邮件
+        """
+        if self.current_counts_error_send < self.counts_send:
+            self.current_counts_error_send += 1
+            self.error_is_send = True
+            self.send_mail.build_mail(self.mail_body["error_body"],
+                                      self.mail_body["error_subject"],
+                                      self.recipients)
+            self.logging.info("error {} send".format(self.project))
+            self.send_mail.send()
+            self.logging.error("Dead monitor error email was send")
+
+    def ok_send(self):
+        """
+        发送返回正常邮件
+        """
+        if self.error_is_send:
+            self.current_counts_error_send = 0
+            self.error_is_send = False
+            self.send_mail.build_mail(self.mail_body["ok_body"],
+                                      self.mail_body["ok_subject"],
+                                      self.recipients)
+            self.logging.info("return ok {} send".format(self.project))
+            self.send_mail.send()
+            self.logging.error("Dead monitor return ok email was send")
+
+
+class GeneralMailMixIn:
+    def generate(self, process_name):
+        """
+        生成邮件标题、正文字典的嵌套格式
+        :param process_name: 进程名称
+        """
+        email_dict = GenerateEmailVar(process_name=process_name,
+                                      **self.conf.get("global.subj_body"))
+        dictionary = email_dict.generate_dict()
+        return dictionary
 
 
 class GenerateEmailVar:

@@ -37,7 +37,7 @@ class LogMonitor:
         self.is_end_of_file = False
         self.current_counts_error_send = 0
         self.send_mail = SendEmail()
-        self.log = log_settings("log/log_monitor.log")
+        self.logging = log_settings("log/log_monitor.log")
 
     def __read_file(self):
         """
@@ -103,8 +103,8 @@ class LogMonitor:
         if self.current_counts_error_send < self.counts_send:
             self.current_counts_error_send += 1
             dictionary = self.mail_build_func.generate_dict("".join(self.deque))
-            self.log.error('Error Message\n {}'.format("".join(self.deque)))
+            self.logging.error('Error Message\n {}'.format("".join(self.deque)))
             self.send_mail.build_mail(**dictionary)
             self.send_mail.send()
-            self.log.error("Log monitor error email was send")
+            self.logging.error("Log monitor error email was send")
 
