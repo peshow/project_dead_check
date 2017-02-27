@@ -96,5 +96,6 @@ class CheckDead(EmailMixIn):
         if self.check_ctime_change() or self.check_size_change():
             self.error_send()
         else:
+            self.logging.info("[{}] is normal operation".format(self.project))
             self.ok_send()
 

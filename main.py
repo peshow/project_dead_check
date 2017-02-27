@@ -50,14 +50,18 @@ class BaseAddConf:
         """
         将时间计算成秒数
         """
+        CONVERT = {
+            "hours": 3600,
+            "hour": 3600,
+            "minutes": 60,
+            "minute": 60,
+            "second": 1,
+            "seconds": 1,
+        }
         count_seconds = 0
         for k, v in scheduler_time.items():
-            if k == "hours" or k == "hour":
-                count_seconds += 3600 * v
-            elif k == "minutes" or k == "minute":
-                count_seconds += 60 * v
-            elif k == "seconds" or k == "second":
-                count_seconds += v
+            if k != "trigger":
+                count_seconds += v * CONVERT[k]
         return count_seconds
 
     def add_params_string(self, dictionary=None):
