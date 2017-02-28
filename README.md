@@ -34,6 +34,10 @@
 * pip install -r requirement.txt
     
     
+**配置文件说明：**
+* 使用哪个功能就配置哪个配置文件，但邮件发送 mail.conf 必须配置
+    
+    
 **配置邮件发送方：**
 ```
 $ vim conf/mail.conf
@@ -51,13 +55,26 @@ $ vim conf/mail.conf
 **配置进程假死监控：**
 ```
 $ vim conf/settings.conf
-thread {
-  file1 {                     // 线程编号, 可随意定义
+global = {                         ## 全局配置段
+    recipients = ""                  // 收件人地址，以逗号隔开
+    counts_send = ""                 // 连续错误时，邮件发送上限
+    scheduler = {                    // 任务调度
+        # trigger: interval          // 以间隔时间执行
+        # seconds: 3
+        # minutes: 30
+        # hours: 3
+    }
+    subj_body = {                    ## 告警时的标题与正文
+        ......
+    }
+}
+thread {                      ## 若不设置可继承global中的配置项
+  file1 {                     // 线程编号, 可随意定义
     project = "a.log"         // 项目名称
     command = "python a.py"   // 运行的进程命令
-    counts_send = 1           // 连续错误时，邮件发送上限
+    counts_send = 1           
     log_path = "/data/a.log"  // 进程输出的日志路径
-    recipients = "test@qq.com" // 收件人列表, 以逗号隔开
+    recipients = "test@qq.com" 
     scheduler = {              ## 线程执行间隔
       trigger = interval
       seconds = 1200           // 按秒 
@@ -68,12 +85,13 @@ thread {
 
 **配置日志异常信息监控：**
 ```
-thread {
-  file1 {                     // 线程编号, 可随意定义
-    project = "a.log"         // 项目名称
-    counts_send = 1           // 连续错误时，邮件发送上限
-    behind = 2                // 输出错误信息后 N 行
-    log_path = "/data/a.log"  // 进程输出的日志路径
+$ vim conf/settings_log.conf
+thread {                       ## 若不设置可继承global中的配置项
+  file1 {                      // 线程编号, 可随意定义
+    project = "a.log"          // 项目名称
+    counts_send = 1            // 连续错误时，邮件发送上限
+    behind = 2                 // 输出错误信息后 N 行
+    log_path = "/data/a.log"   // 进程输出的日志路径
     recipients = "test@qq.com" // 收件人列表, 以逗号隔开
     patterns = "error"         // 异常信息的匹配正则
     auto_cut = "True"          // 日志是否自动切割
@@ -87,7 +105,8 @@ thread {
 
 **配置进程存活监控**
 ```
-thread {                         ## 各线程配置段
+$ vim conf/settings_alive.conf
+thread {                         ## 若不设置可继承global中的配置项
   file1 {                        ## 线程编号, 可随意定义
     project = "Monitor a.py"      // 监控的项目名
     command = "python a.py"       // 运行的进程命令
@@ -101,7 +120,40 @@ thread {                         ## 各线程配置段
 **启动监控:**
 * -m：仅启动日志异常监控
 * -d：仅启动进程假死监控
-* -i: 仅启动进程存活监控
+* -i：仅启动进程存活监控
 ```
 nohup python main.py -l -d &
 ```
+
+
+**配置示例:**
+```
+$ vim conf/settings_log.conf
+{
+  global = { 
+    recipients = "XXXX@qq.com" 
+    counts_send = 1   
+    scheduler = {  
+        trigger: interval 
+        seconds: 1200
+    }
+    subj_body = {      
+        ......
+    }
+  }
+  thread {
+    file1 {                   
+      project = "baidu爬虫"     
+      command = "python main.py baidu.log"  
+      log_path = "/log/baidu.log"
+    }
+    file2 {
+      project = "sogou爬虫"
+      command = "python main.py log/sogou.log"
+      log_path = "/log/sogou.log"
+      scheduler = {
+        trigger: interval
+        minutes: 3
+        hours: 1
+    }
+}
