@@ -73,7 +73,7 @@ class GenerateEmailVar:
         <p><strong>Project:</strong> {process_name}<p>
         <strong>Content:</strong>
         <pre>{body}</pre>'''.format(ip=IP,
-                                    date=DATE,
+                                    date=DATE(),
                                     process_name=self.process_name,
                                     body=body)
         return mail_body

@@ -38,4 +38,4 @@ def get_current_time():
     return current_time
 
 IP = get_ip()
-DATE = get_current_time()
+DATE = get_current_time
