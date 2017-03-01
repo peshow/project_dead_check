@@ -64,20 +64,20 @@ global = {                         ## 全局配置段
         # minutes: 30
         # hours: 3
     }
-    subj_body = {                    ## 告警时的标题与正文
+    subj_body = {                  ## 告警时的标题与正文
         ......
     }
 }
-thread {                      ## 若不设置可继承global中的配置项
-  file1 {                     // 线程编号, 可随意定义
-    project = "a.log"         // 项目名称
-    command = "python a.py"   // 运行的进程命令
+thread {                           ## 若不设置可继承global中的配置项
+  file1 {                          // 线程编号, 可随意定义
+    project = "a.log "             // 项目名称
+    command = "python a.py"        // 运行的进程命令
     counts_send = 1           
-    log_path = "/data/a.log"  // 进程输出的日志路径
+    log_path = "/data/a.log"       // 进程输出的日志路径
     recipients = "test@qq.com" 
-    scheduler = {              ## 线程执行间隔
+    scheduler = {                  ## 线程执行间隔
       trigger = interval
-      seconds = 1200           // 按秒 
+      seconds = 1200               // 按秒 
       }
   }
 }
@@ -86,18 +86,19 @@ thread {                      ## 若不设置可继承global中的配�
 **配置日志异常信息监控：**
 ```
 $ vim conf/settings_log.conf
-thread {                       ## 若不设置可继承global中的配置项
-  file1 {                      // 线程编号, 可随意定义
-    project = "a.log"          // 项目名称
-    counts_send = 1            // 连续错误时，邮件发送上限
-    behind = 2                 // 输出错误信息后 N 行
-    log_path = "/data/a.log"   // 进程输出的日志路径
-    recipients = "test@qq.com" // 收件人列表, 以逗号隔开
-    patterns = "error"         // 异常信息的匹配正则
-    auto_cut = "True"          // 日志是否自动切割
-    scheduler = {              ## 线程执行间隔
+thread {                           ## 若不设置可继承global中的配置项
+  file1 {                          // 线程编号, 可随意定义
+    project = "a.log"              // 项目名称
+    counts_send = 1                // 连续错误时，邮件发送上限
+    format = ".%Y-%m-%d"           // 切割的时间格式，仅支持后缀添加
+    behind = 2                     // 输出错误信息后 N 行
+    log_path = "/data/a.log"       // 进程输出的日志路径
+    recipients = "test@qq.com"     // 收件人列表, 以逗号隔开
+    patterns = "error"             // 异常信息的匹配正则
+    auto_cut = "True"              // 日志是否自动切割
+    scheduler = {                  ## 线程执行间隔
       trigger = interval
-      seconds = 1200           // 按秒 
+      seconds = 1200               // 按秒 
       }
   }
 }
@@ -106,12 +107,12 @@ thread {                       ## 若不设置可继承global中的配置项
 **配置进程存活监控**
 ```
 $ vim conf/settings_alive.conf
-thread {                         ## 若不设置可继承global中的配置项
-  file1 {                        ## 线程编号, 可随意定义
-    project = "Monitor a.py"      // 监控的项目名
-    command = "python a.py"       // 运行的进程命令
+thread {                           ## 若不设置可继承global中的配置项
+  file1 {                          ## 线程编号, 可随意定义
+    project = "Monitor a.py"       // 监控的项目名
+    command = "python a.py"        // 运行的进程命令
     recipients = "test@qq.com"
-    scheduler = {                 // 配置任务调度，即监控间隔
+    scheduler = {                  // 配置任务调度，即监控间隔
       trigger = interval
       seconds = 5
       }

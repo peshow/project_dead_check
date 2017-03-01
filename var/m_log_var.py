@@ -1,7 +1,7 @@
 from .global_var import *
 
 
-class GenerateMonitorVar:
+class GenerateMonitorVar(GetTimeMixIn):
     def __init__(self, subject=None, process_name=None, recipients=None):
         """
         生成日志异常信息监控的'标题,正文,收件人列表'
@@ -29,7 +29,7 @@ class GenerateMonitorVar:
         <p><strong>Project:</strong> {process_name}<p>
         <strong>Content:</strong>
         <pre>{body}</pre>'''.format(ip=IP,
-                                    date=DATE(),
+                                    date=self.get_current_time(),
                                     process_name=self.process_name,
                                     body=body)
         return mail_body

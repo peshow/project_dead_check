@@ -152,7 +152,7 @@ class AddLogConfig(BaseAddConf):
         """
         :param func: 传入APScheduler的add_job函数，用来添加任务
         """
-        add = {"counts_send": 1, "patterns": 1, "auto_cut": 1, "subject": 1, "behind": 1}
+        add = {"counts_send": 1, "patterns": 1, "auto_cut": 1, "subject": 1, "behind": 1, "format": 1}
         self.edit_params_string(add)
         for item in self.items:
             self.inspect_params(item)
@@ -163,7 +163,8 @@ class AddLogConfig(BaseAddConf):
             log_monitor = LogMonitor(item["log_path"],
                                      item["patterns"],
                                      mail_build_func,
-                                     item["auto_cut"])
+                                     item["auto_cut"],
+                                     item["format"])
             func(log_monitor.main_parse,
                  max_instances=10,
                  timezone=pytz.timezone("Asia/Shanghai"),

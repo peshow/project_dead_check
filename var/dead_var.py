@@ -15,7 +15,7 @@ class EmailMixIn:
         """
         设置邮件的发送信息
         """
-        mail_body = self.mail_body.generate_dict(DATE())
+        mail_body = self.mail_body.generate_dict()
         self.send_mail.build_mail(mail_body["{}_body".format(error_or_ok)],
                                   mail_body["{}_subject".format(error_or_ok)],
                                   self.recipients)
@@ -59,7 +59,7 @@ class GeneralMailMixIn:
         return email_dict
 
 
-class GenerateEmailVar:
+class GenerateEmailVar(GetTimeMixIn):
     def __init__(self, process_name, ok_subject=None, ok_body=None, error_subject=None, error_body=None):
         """
         用来设置邮件的内容格式与标题
@@ -92,7 +92,8 @@ class GenerateEmailVar:
                                     body=body)
         return mail_body
 
-    def generate_dict(self, date):
+    def generate_dict(self):
+        date = self.get_current_time()
         dictionary = {
             "error_subject": self.generate_subject(),
             "error_body": self.generate_mail_body(date),

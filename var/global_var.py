@@ -27,15 +27,17 @@ def get_ip():
         return "127.0.0.1"
 
 
-def get_current_time():
-    """
-    获取当前的时间字符串
-    """
-    tm_format = "%Y-%m-%d %H:%M:%S"
-    tz = pytz.timezone("Asia/Shanghai")
-    now = tz.localize(datetime.datetime.now())
-    current_time = now.strftime(tm_format)
-    return current_time
+class GetTimeMixIn:
+    @staticmethod
+    def get_current_time():
+        """
+        获取当前的时间字符串
+        """
+        tm_format = "%Y-%m-%d %H:%M:%S"
+        tz = pytz.timezone("Asia/Shanghai")
+        now = tz.localize(datetime.datetime.now())
+        current_time = now.strftime(tm_format)
+        return current_time
 
 IP = get_ip()
-DATE = get_current_time
+
