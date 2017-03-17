@@ -1,0 +1,69 @@
+[2017-03-01 10:44:56,763] INFO [MainThread] - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2017-03-01 10:44:56,764] INFO [MainThread] - Added job "LogMonitor.main_parse" to job store "default"
+[2017-03-01 10:44:56,764] INFO [MainThread] - Scheduler started
+[2017-03-01 10:45:56,764] INFO [Thread-1] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:45:56 CST)" (scheduled at 2017-03-01 10:45:56.763219+08:00)
+[2017-03-01 10:45:56,766] ERROR [Thread-1] - Error Message
+ error fdsf
+
+[2017-03-01 10:45:56,770] ERROR [Thread-1] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:46:56 CST)" raised an exception
+Traceback (most recent call last):
+  File "/root/.pyenv/versions/orm/lib/python3.5/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/root/project_dead_check/func/log_momitor.py", line 84, in main_parse
+    self.send()
+  File "/root/project_dead_check/func/log_momitor.py", line 108, in send
+    self.send_mail.send()
+  File "/root/project_dead_check/sendmail.py", line 57, in send
+    self.check_param()
+  File "/root/project_dead_check/sendmail.py", line 51, in check_param
+    raise EmailParamNotSet(key)
+m_error.custom_error.EmailParamNotSet: conf/mail.conf send_id parameter not setting
+[2017-03-01 10:46:56,765] INFO [Thread-1] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:46:56 CST)" (scheduled at 2017-03-01 10:46:56.763219+08:00)
+[2017-03-01 10:46:56,766] INFO [Thread-1] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:46:56 CST)" executed successfully
+[2017-03-01 10:47:56,766] INFO [Thread-1] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:47:56 CST)" (scheduled at 2017-03-01 10:47:56.763219+08:00)
+[2017-03-01 10:47:56,767] INFO [Thread-1] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:47:56 CST)" executed successfully
+[2017-03-01 10:48:56,768] INFO [Thread-2] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:48:56 CST)" (scheduled at 2017-03-01 10:48:56.763219+08:00)
+[2017-03-01 10:48:56,769] INFO [Thread-2] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:48:56 CST)" executed successfully
+[2017-03-01 10:49:56,768] INFO [Thread-1] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:49:56 CST)" (scheduled at 2017-03-01 10:49:56.763219+08:00)
+[2017-03-01 10:49:56,769] INFO [Thread-1] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:49:56 CST)" executed successfully
+[2017-03-01 10:50:56,772] INFO [Thread-3] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:50:56 CST)" (scheduled at 2017-03-01 10:50:56.763219+08:00)
+[2017-03-01 10:50:56,772] INFO [Thread-3] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:50:56 CST)" executed successfully
+[2017-03-01 10:51:56,766] INFO [Thread-2] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:51:56 CST)" (scheduled at 2017-03-01 10:51:56.763219+08:00)
+[2017-03-01 10:51:56,767] INFO [Thread-2] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:51:56 CST)" executed successfully
+[2017-03-01 10:52:56,766] INFO [Thread-4] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:52:56 CST)" (scheduled at 2017-03-01 10:52:56.763219+08:00)
+[2017-03-01 10:52:56,767] INFO [Thread-4] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:52:56 CST)" executed successfully
+[2017-03-01 10:53:56,766] INFO [Thread-1] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:53:56 CST)" (scheduled at 2017-03-01 10:53:56.763219+08:00)
+[2017-03-01 10:53:56,767] INFO [Thread-1] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:53:56 CST)" executed successfully
+[2017-03-01 10:54:56,773] INFO [Thread-5] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:54:56 CST)" (scheduled at 2017-03-01 10:54:56.763219+08:00)
+[2017-03-01 10:54:56,774] INFO [Thread-5] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:54:56 CST)" executed successfully
+[2017-03-01 10:55:56,767] INFO [Thread-3] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:56:56 CST)" (scheduled at 2017-03-01 10:55:56.763219+08:00)
+[2017-03-01 10:55:56,768] INFO [Thread-3] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:56:56 CST)" executed successfully
+[2017-03-01 10:56:56,764] INFO [Thread-6] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:57:56 CST)" (scheduled at 2017-03-01 10:56:56.763219+08:00)
+[2017-03-01 10:56:56,765] INFO [Thread-6] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:57:56 CST)" executed successfully
+[2017-03-01 10:57:56,764] INFO [Thread-2] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:58:56 CST)" (scheduled at 2017-03-01 10:57:56.763219+08:00)
+[2017-03-01 10:57:56,765] INFO [Thread-2] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:58:56 CST)" executed successfully
+[2017-03-01 10:58:56,764] INFO [Thread-7] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:59:56 CST)" (scheduled at 2017-03-01 10:58:56.763219+08:00)
+[2017-03-01 10:58:56,765] INFO [Thread-7] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 10:59:56 CST)" executed successfully
+[2017-03-01 10:59:56,764] INFO [Thread-4] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:00:56 CST)" (scheduled at 2017-03-01 10:59:56.763219+08:00)
+[2017-03-01 10:59:56,765] INFO [Thread-4] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:00:56 CST)" executed successfully
+[2017-03-01 11:00:56,764] INFO [Thread-8] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:01:56 CST)" (scheduled at 2017-03-01 11:00:56.763219+08:00)
+[2017-03-01 11:00:56,765] INFO [Thread-8] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:01:56 CST)" executed successfully
+[2017-03-01 11:01:56,764] INFO [Thread-1] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:02:56 CST)" (scheduled at 2017-03-01 11:01:56.763219+08:00)
+[2017-03-01 11:01:56,765] INFO [Thread-1] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:02:56 CST)" executed successfully
+[2017-03-01 11:02:56,764] INFO [Thread-9] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:03:56 CST)" (scheduled at 2017-03-01 11:02:56.763219+08:00)
+[2017-03-01 11:02:56,765] INFO [Thread-9] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:03:56 CST)" executed successfully
+[2017-03-01 11:03:56,764] INFO [Thread-5] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:04:56 CST)" (scheduled at 2017-03-01 11:03:56.763219+08:00)
+[2017-03-01 11:03:56,765] INFO [Thread-5] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:04:56 CST)" executed successfully
+[2017-03-01 11:04:56,764] INFO [Thread-10] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:05:56 CST)" (scheduled at 2017-03-01 11:04:56.763219+08:00)
+[2017-03-01 11:04:56,765] INFO [Thread-10] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:05:56 CST)" executed successfully
+[2017-03-01 11:05:56,764] INFO [Thread-3] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:06:56 CST)" (scheduled at 2017-03-01 11:05:56.763219+08:00)
+[2017-03-01 11:05:56,765] INFO [Thread-3] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:06:56 CST)" executed successfully
+[2017-03-01 11:06:56,764] INFO [Thread-6] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:07:56 CST)" (scheduled at 2017-03-01 11:06:56.763219+08:00)
+[2017-03-01 11:06:56,765] INFO [Thread-6] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:07:56 CST)" executed successfully
+[2017-03-01 11:07:56,764] INFO [Thread-2] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:08:56 CST)" (scheduled at 2017-03-01 11:07:56.763219+08:00)
+[2017-03-01 11:07:56,765] INFO [Thread-2] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:08:56 CST)" executed successfully
+[2017-03-01 11:08:56,764] INFO [Thread-7] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:09:56 CST)" (scheduled at 2017-03-01 11:08:56.763219+08:00)
+[2017-03-01 11:08:56,765] INFO [Thread-7] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:09:56 CST)" executed successfully
+[2017-03-01 11:09:56,765] INFO [Thread-4] - Running job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:10:56 CST)" (scheduled at 2017-03-01 11:09:56.763219+08:00)
+[2017-03-01 11:09:56,765] INFO [Thread-4] - Job "LogMonitor.main_parse (trigger: interval[0:01:00], next run at: 2017-03-01 11:10:56 CST)" executed successfully
+[2017-03-01 11:10:31,570] INFO [MainThread] - Scheduler has been shut down

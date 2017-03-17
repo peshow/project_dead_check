@@ -58,6 +58,15 @@ class LogMonitor:
             self.file_exists += 1
             if self.file_exists > 3:
                 self.logging.error("{} is Not Found".format(self.log_path))
+                self._not_found_send()
+
+    def _not_found_send(self, recipients=None):
+        body = "{} is Not found".format(self.log_path)
+        subject = "Log Monitor Error"
+        self.send_mail.build_mail(body,
+                                  subject,
+                                  getattr(self.mail_build_func, "recipients", recipients))
+        self.send_mail.send()
 
     def main_parse(self):
         """

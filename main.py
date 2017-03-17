@@ -171,7 +171,7 @@ class AddLogConfig(BaseAddConf):
                  **item["scheduler"])
 
 
-class AddAliveConfig(BaseAddConf, GeneralMailMixIn):
+class AddAliveConfig(GeneralMailMixIn, BaseAddConf):
     def __init__(self, conf_name="settings_alive.conf"):
         super().__init__(conf_name)
 
