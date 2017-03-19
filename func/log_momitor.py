@@ -50,6 +50,7 @@ class LogMonitor:
                     with open(self.cut()) as f_prev:
                         f_prev.seek(self.__cursor)
                         yield from f_prev
+                        self.__cursor = 0
                 f.seek(self.__cursor)
                 yield from f
                 self.__cursor = f.tell()
@@ -91,9 +92,6 @@ class LogMonitor:
                     self.current_counts_error_send = 0
         if self.number <= self.behind:
             self.send()
-            self.__cursor = self.__current_cursor
-            self.number = self.behind + 1
-            self.deque = deque(maxlen=3)
 
     def cut(self):
         """
@@ -114,6 +112,13 @@ class LogMonitor:
             dictionary = self.mail_build_func.generate_dict("".join(self.deque))
             self.logging.error('Error Message\n {}'.format("".join(self.deque)))
             self.send_mail.build_mail(**dictionary)
+            """
+            数据生成邮件内容后的清理操作
+            """
+            self.__cursor = self.__current_cursor
+            self.number = self.behind + 1
+            self.deque = deque(maxlen=3)
+
             self.send_mail.send()
             self.logging.error("Log monitor error email was send")
 
