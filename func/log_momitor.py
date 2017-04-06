@@ -38,6 +38,7 @@ class LogMonitor:
         self.current_counts_error_send = 0
         self.send_mail = SendEmail()
         self.logging = log_settings("log/log_monitor.log")
+        self._is_not_found = True     # 判断日志文件不存在时发送邮件的标志位
 
     def __read_file(self):
         """
@@ -55,15 +56,20 @@ class LogMonitor:
                 yield from f
                 self.__cursor = f.tell()
                 self.file_exists = 0
+                self._is_not_found = True
         except FileNotFoundError:
             self.file_exists += 1
-            if self.file_exists > 3:
+            if self.file_exists > 3 and self._is_not_found:
                 self.logging.error("{} is Not Found".format(self.log_path))
                 self._not_found_send()
 
     def _not_found_send(self, recipients=None):
+        """
+        日志文件不存在时发送邮件
+        """
         body = "{} is Not found".format(self.log_path)
         subject = "Log Monitor Error"
+        self._is_not_found = False
         self.send_mail.build_mail(body,
                                   subject,
                                   getattr(self.mail_build_func, "recipients", recipients))
