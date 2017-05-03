@@ -87,15 +87,18 @@ class CheckDead(EmailMixIn):
         return
 
     @CheckRunning
-    def main_check(self):
+    def main_check(self, interval=30):
         """
         进程假死检测主函数
         """
         if self.__check_is_first():
             return
-        if self.check_ctime_change() or self.check_size_change():
+        if not self.error_is_send and self.check_ctime_change() or self.check_size_change():
             self.error_send()
-        else:
-            self.logging.info("[{}] is normal operation".format(self.project))
-            self.ok_send()
+            while True:
+                if self.check_ctime_change() is None or self.check_size_change() is None:
+                    self.logging.info("[{}] is normal operation".format(self.project))
+                    self.ok_send()
+                    break
+                time.sleep(interval)
 
