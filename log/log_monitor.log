@@ -1,2 +1,0 @@
-[2017-04-06 13:31:38,153] INFO [Thread-6] - Running job "LogMonitor.main_parse (trigger: interval[0:00:10], next run at: 2017-04-06 13:31:48 CST)" (scheduled at 2017-04-06 13:31:38.151937+08:00)
-[2017-04-06 13:31:38,154] INFO [Thread-6] - Job "LogMonitor.main_parse (trigger: interval[0:00:10], next run at: 2017-04-06 13:31:48 CST)" executed successfully

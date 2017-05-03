@@ -36,13 +36,12 @@ class EmailMixIn:
         """
         发送返回正常邮件
         """
-        if self.error_is_send:
-            self.current_counts_error_send = 0
-            self.error_is_send = False
-            self.set_mail_info("ok")
-            self.logging.info("return ok {} send".format(self.project))
-            self.send_mail.send()
-            self.logging.error("Dead monitor return ok email was send")
+        self.current_counts_error_send = 0
+        self.error_is_send = False
+        self.set_mail_info("ok")
+        self.logging.info("return ok {} send".format(self.project))
+        self.send_mail.send()
+        self.logging.error("Dead monitor return ok email was send")
 
 
 class GeneralMailMixIn:
