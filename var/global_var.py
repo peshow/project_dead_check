@@ -4,9 +4,11 @@ import socket
 import datetime
 import logging
 
+BASE_DIR = os.path.dirname(os.path.abspath(__name__))
+
 
 def log_settings(logname):
-    path = os.path.join(os.getcwd(), logname)
+    path = os.path.join(BASE_DIR, logname)
     logging.basicConfig(filename=path,
                         level=logging.INFO,
                         format='[%(asctime)s] %(levelname)s [%(threadName)s] - %(message)s')

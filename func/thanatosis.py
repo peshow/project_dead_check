@@ -2,7 +2,7 @@ import os
 import re
 import time
 import psutil
-from functools import wraps
+from subprocess import Popen, PIPE, STDOUT
 from var.global_var import log_settings
 from var.dead_var import EmailMixIn
 
@@ -32,7 +32,8 @@ class CheckRunning:
 
 
 class CheckDead(EmailMixIn):
-    def __init__(self, project, log_path, counts_send, command, mail_body=None, recipients=None, delay=60):
+    def __init__(self, project, log_path, counts_send, command,
+                 mail_body=None, recipients=None, executes=None, delay=60):
         """
         根据日志文件的ctime和size的变化，判断进程是否假死
         :param log_path: 日志文件位置
@@ -47,6 +48,7 @@ class CheckDead(EmailMixIn):
         self.command = command
         self.mail_body = mail_body
         self.recipients = recipients
+        self.executes = executes
         self.delay = delay
         self.previous_size = os.path.getsize(log_path)
         self.previous_ctime = os.path.getctime(log_path)
@@ -86,6 +88,19 @@ class CheckDead(EmailMixIn):
         self.previous_ctime = now
         return
 
+    def operation(self):
+        if self.executes is not None:
+            with Popen(["/bin/bash", "-lc", "{}".format(self.executes)],
+                       stdout=PIPE,
+                       stderr=STDOUT,
+                       start_new_session=True) as exe:
+                code = exe.wait(30)
+                out, *_ = exe.communicate()
+                if code == 0:
+                    self.logging.info("[{}] restart Success".format(self.project))
+                else:
+                    self.logging.warning("[{}] restart Failure".format(self.project))
+
     @CheckRunning
     def main_check(self, interval=30):
         """
@@ -96,6 +111,7 @@ class CheckDead(EmailMixIn):
         if not self.error_is_send and self.check_ctime_change() or self.check_size_change():
             self.error_send()
             while True:
+                self.operation()
                 if self.check_ctime_change() is None or self.check_size_change() is None:
                     self.logging.info("[{}] is normal operation".format(self.project))
                     self.ok_send()
