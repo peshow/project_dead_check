@@ -23,7 +23,8 @@ class InspectProcessAlive(EmailMixIn):
             if pattern.search(cmd):
                 is_running = True
         if is_running:
-            self.ok_send()
+            if self.error_is_send:
+                self.ok_send()
         else:
             self.logging.warning("[{}] is not stop running!".format(self.project))
             self.error_send()
