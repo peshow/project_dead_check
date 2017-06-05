@@ -1,15 +1,16 @@
 import re
 import psutil
-from var.global_var import log_settings
+from var.global_var import log_settings, ExecuteMixin
 from var.dead_var import EmailMixIn
 
 
-class InspectProcessAlive(EmailMixIn):
-    def __init__(self, project, command, mail_body, recipients):
+class InspectProcessAlive(EmailMixIn, ExecuteMixin):
+    def __init__(self, project, command, mail_body, recipients, executes=None):
         self.project = project
         self.command = command
         self.mail_body = mail_body
         self.recipients = recipients
+        self.executes = executes
 
         self.counts_send = 1
         self.current_error_send = 0
@@ -28,3 +29,4 @@ class InspectProcessAlive(EmailMixIn):
         else:
             self.logging.warning("[{}] is not stop running!".format(self.project))
             self.error_send()
+            self.operation()

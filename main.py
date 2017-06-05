@@ -73,7 +73,7 @@ class AddAliveConfig(GeneralMailMixIn, BaseAddConf):
         super().__init__(conf_name)
 
     def add_process_alive(self, func):
-        add = {"command": 0}
+        add = {"command": 0, "executes": 1}
         delete = ["log_path"]
         self.edit_params_string(add, *delete)
         for item in self.items:
@@ -81,7 +81,8 @@ class AddAliveConfig(GeneralMailMixIn, BaseAddConf):
             inspect_process_alive = InspectProcessAlive(item["project"],
                                                         item["command"],
                                                         self.generate(item["project"]),
-                                                        item["recipients"])
+                                                        item["recipients"],
+                                                        item["executes"])
             func(inspect_process_alive.main_inspect,
                  max_instances=10,
                  timezone=pytz.timezone("Asia/Shanghai"),

@@ -1,9 +1,8 @@
 import os
 import re
 import time
-import psutil
-from subprocess import Popen, PIPE, STDOUT
-from var.global_var import log_settings
+import psutil 
+from var.global_var import log_settings, ExecuteMixin
 from var.dead_var import EmailMixIn
 
 
@@ -31,7 +30,7 @@ class CheckRunning:
         return stash
 
 
-class CheckDead(EmailMixIn):
+class CheckDead(EmailMixIn, ExecuteMixin):
     def __init__(self, project, log_path, counts_send, command,
                  mail_body=None, recipients=None, executes=None, delay=60):
         """
@@ -87,19 +86,6 @@ class CheckDead(EmailMixIn):
             return True
         self.previous_ctime = now
         return
-
-    def operation(self):
-        if self.executes is not None:
-            with Popen(["/bin/bash", "-lc", "{}".format(self.executes)],
-                       stdout=PIPE,
-                       stderr=STDOUT,
-                       start_new_session=True) as exe:
-                code = exe.wait(30)
-                out, *_ = exe.communicate()
-                if code == 0:
-                    self.logging.info("[{}] restart Success".format(self.project))
-                else:
-                    self.logging.warning("[{}] restart Failure".format(self.project))
 
     @CheckRunning
     def main_check(self, interval=30):
