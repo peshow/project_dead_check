@@ -44,10 +44,10 @@ class GetTimeMixIn:
 
 
 class ExecuteMixin:
-    executes = None
+    executes = ""
 
     def operation(self):
-        if self.executes is not None:
+        if self.executes:
             with Popen(["/bin/bash", "-lc", "{}".format(self.executes)],
                        stdout=PIPE,
                        stderr=STDOUT,
