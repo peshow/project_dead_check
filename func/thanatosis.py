@@ -2,8 +2,9 @@ import os
 import re
 import time
 import psutil 
-from var.global_var import log_settings, ExecuteMixin
+from sendmail import SendEmail
 from var.dead_var import EmailMixIn
+from var.global_var import log_settings, ExecuteMixin
 
 
 class CheckRunning:
@@ -53,6 +54,7 @@ class CheckDead(EmailMixIn, ExecuteMixin):
         self.previous_ctime = os.path.getctime(log_path)
         self.__is_first_run = True
         self.logging = log_settings("log/dead_monitor.log")
+        self.send_mail = SendEmail()
 
     def __check_is_first(self):
         """

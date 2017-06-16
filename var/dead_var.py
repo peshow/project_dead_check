@@ -8,7 +8,7 @@ class EmailMixIn:
     实现简单地邮件正文与标题的发送
     """
     current_counts_error_send = 0
-    send_mail = SendEmail()
+    send_mail = SendEmail()   # 该属性需要定义在继承类的__init__上
     error_is_send = False
 
     def set_mail_info(self, error_or_ok):

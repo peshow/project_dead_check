@@ -1,7 +1,8 @@
 import re
 import psutil
-from var.global_var import log_settings, ExecuteMixin
+from sendmail import SendEmail
 from var.dead_var import EmailMixIn
+from var.global_var import log_settings, ExecuteMixin
 
 
 class InspectProcessAlive(EmailMixIn, ExecuteMixin):
@@ -12,6 +13,7 @@ class InspectProcessAlive(EmailMixIn, ExecuteMixin):
         self.recipients = recipients
         self.executes = executes
 
+        self.send_mail = SendEmail()
         self.counts_send = 1
         self.current_error_send = 0
         self.logging = log_settings("log/process_alive.log")

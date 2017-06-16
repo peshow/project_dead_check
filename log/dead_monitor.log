@@ -1,0 +1,12 @@
+[2017-06-16 10:46:39,476] INFO [MainThread] - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2017-06-16 10:46:39,559] INFO [MainThread] - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2017-06-16 10:46:39,612] INFO [MainThread] - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2017-06-16 10:46:39,626] INFO [MainThread] - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2017-06-16 10:46:39,642] INFO [MainThread] - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[2017-06-16 10:46:39,643] INFO [MainThread] - Added job "CheckRunning.__get__.<locals>.stash" to job store "default"
+[2017-06-16 10:46:39,643] INFO [MainThread] - Added job "LogMonitor.main_parse" to job store "default"
+[2017-06-16 10:46:39,643] INFO [MainThread] - Added job "InspectProcessAlive.main_inspect" to job store "default"
+[2017-06-16 10:46:39,644] INFO [MainThread] - Added job "InspectProcessAlive.main_inspect" to job store "default"
+[2017-06-16 10:46:39,644] INFO [MainThread] - Added job "InspectProcessAlive.main_inspect" to job store "default"
+[2017-06-16 10:46:39,644] INFO [MainThread] - Scheduler started
+[2017-06-16 10:46:43,806] INFO [MainThread] - Scheduler has been shut down
